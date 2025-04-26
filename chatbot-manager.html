@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Manager - Excel Export</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f5ff;
+            padding: 2rem;
+        }
+        
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(157, 193, 251, 0.3);
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            margin: 0 auto;
+        }
+        
+        h1, h2 {
+            color: #5b8ad4;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .accent {
+            color: #356abc;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #356abc;
+            font-weight: 500;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #c9dbff;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #8ab4f8;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .keyword-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .keyword-tag {
+            background-color: #eaf2ff;
+            border-radius: 15px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            color: #356abc;
+        }
+        
+        .keyword-tag button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .response-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .response-item {
+            background-color: #eaf2ff;
+            border-radius: 15px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #356abc;
+        }
+        
+        .response-item button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        button {
+            background-color: #8ab4f8;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #6a9eeb;
+        }
+        
+        button.danger {
+            background-color: #ff6b6b;
+        }
+        
+        button.danger:hover {
+            background-color: #ff5252;
+        }
+        
+        button.success {
+            background-color: #4caf50;
+        }
+        
+        button.success:hover {
+            background-color: #3d8b40;
+        }
+        
+        .chatbot-data-container {
+            margin-top: 2rem;
+            border-top: 2px solid #eaf2ff;
+            padding-top: 2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(157, 193, 251, 0.2);
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eaf2ff;
+        }
+        
+        th {
+            background-color: #8ab4f8;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f5f9ff;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-buttons button {
+            padding: 0.5rem 1rem;
+        }
+        
+        .keyword-cell, .response-cell {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .keyword-cell span, .response-cell span {
+            display: inline-block;
+            background-color: #eaf2ff;
+            border-radius: 15px;
+            padding: 5px 10px;
+            margin: 2px;
+            color: #356abc;
+        }
+        
+        .status-bar {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .status-bar.success {
+            background-color: #e8f5e9;
+            color: #4caf50;
+            display: block;
+        }
+        
+        .status-bar.error {
+            background-color: #ffebee;
+            color: #ff5252;
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #8ab4f8;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            th, td {
+                padding: 0.8rem;
+            }
+        }
+    </style>
+    <!-- Menggunakan CDN SheetJS (lebih reliable) -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Chatbot <span class="accent">Data Manager</span></h1>
+        
+        <div id="statusBar" class="status-bar"></div>
+        
+        <div class="form-container">
+            <h2>Tambah Data Chatbot</h2>
+            
+            <div class="form-group">
+                <label for="keywordInput">Keyword (kata kunci):</label>
+                <input type="text" id="keywordInput" placeholder="Masukkan kata kunci..." onkeypress="handleKeywordEnter(event)">
+                <button onclick="addKeyword()" style="margin-top: 10px;">Tambah Keyword</button>
+                <div id="keywordList" class="keyword-list"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="responseInput">Response (jawaban):</label>
+                <textarea id="responseInput" placeholder="Masukkan jawaban..."></textarea>
+                <button onclick="addResponse()" style="margin-top: 10px;">Tambah Response</button>
+                <div id="responseList" class="response-list"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="actionType">Action Type (opsional):</label>
+                <select id="actionType" style="width: 100%; padding: 0.8rem 1.2rem; border: 2px solid #c9dbff; border-radius: 10px;">
+                    <option value="none">Tidak ada action</option>
+                    <option value="url">Buka URL</option>
+                </select>
+            </div>
+            
+            <div id="actionValueContainer" class="form-group" style="display: none;">
+                <label for="actionValue">URL:</label>
+                <input type="text" id="actionValue" placeholder="https://example.com">
+            </div>
+            
+            <div class="button-container">
+                <button onclick="saveData()">Simpan Data</button>
+                <button onclick="resetForm()" class="danger">Reset Form</button>
+            </div>
+        </div>
+        
+        <div class="chatbot-data-container">
+            <h2>Data Chatbot</h2>
+            
+            <div class="button-container">
+                <button onclick="exportToExcel()" class="success">Export ke Excel</button>
+                <button onclick="generateJavaScriptData()" class="success">Generate datachatbot.js</button>
+                <button onclick="saveToLocalStorage()" class="success">Simpan ke Browser</button>
+                <button onclick="loadFromLocalStorage()">Load dari Browser</button>
+                <button onclick="clearAllData()" class="danger">Hapus Semua Data</button>
+            </div>
+            
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th width="5%">No</th>
+                        <th width="30%">Keywords</th>
+                        <th width="40%">Responses</th>
+                        <th width="10%">Action</th>
+                        <th width="15%">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="footer">
+        &copy; 2025 Chatbot Data Manager
+    </div>
+    
+    <script>
+        // Variables
+        let currentKeywords = [];
+        let currentResponses = [];
+        let chatbotData = [];
+        let editingIndex = -1;
+        
+        // Event listeners
+        document.getElementById('actionType').addEventListener('change', function() {
+            const actionValueContainer = document.getElementById('actionValueContainer');
+            if (this.value === 'url') {
+                actionValueContainer.style.display = 'block';
+            } else {
+                actionValueContainer.style.display = 'none';
+            }
+        });
+        
+        // Functions for keyword handling
+        function handleKeywordEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addKeyword();
+            }
+        }
+        
+        function addKeyword() {
+            const keywordInput = document.getElementById('keywordInput');
+            const keyword = keywordInput.value.trim().toLowerCase();
+            
+            if (keyword === '') {
+                showStatus('Keyword tidak boleh kosong!', 'error');
+                return;
+            }
+            
+            if (!currentKeywords.includes(keyword)) {
+                currentKeywords.push(keyword);
+                renderKeywords();
+                keywordInput.value = '';
+            } else {
+                showStatus('Keyword sudah ditambahkan!', 'error');
+            }
+            
+            keywordInput.focus();
+        }
+        
+        function removeKeyword(index) {
+            currentKeywords.splice(index, 1);
+            renderKeywords();
+        }
+        
+        function renderKeywords() {
+            const keywordList = document.getElementById('keywordList');
+            keywordList.innerHTML = '';
+            
+            currentKeywords.forEach((keyword, index) => {
+                const keywordTag = document.createElement('div');
+                keywordTag.className = 'keyword-tag';
+                keywordTag.innerHTML = `
+                    ${keyword}
+                    <button onclick="removeKeyword(${index})">×</button>
+                `;
+                keywordList.appendChild(keywordTag);
+            });
+        }
+        
+        // Functions for response handling
+        function addResponse() {
+            const responseInput = document.getElementById('responseInput');
+            const response = responseInput.value.trim();
+            
+            if (response === '') {
+                showStatus('Response tidak boleh kosong!', 'error');
+                return;
+            }
+            
+            if (!currentResponses.includes(response)) {
+                currentResponses.push(response);
+                renderResponses();
+                responseInput.value = '';
+            } else {
+                showStatus('Response sudah ditambahkan!', 'error');
+            }
+            
+            responseInput.focus();
+        }
+        
+        function removeResponse(index) {
+            currentResponses.splice(index, 1);
+            renderResponses();
+        }
+        
+        function renderResponses() {
+            const responseList = document.getElementById('responseList');
+            responseList.innerHTML = '';
+            
+            currentResponses.forEach((response, index) => {
+                const responseItem = document.createElement('div');
+                responseItem.className = 'response-item';
+                responseItem.innerHTML = `
+                    <div>${response}</div>
+                    <button onclick="removeResponse(${index})">×</button>
+                `;
+                responseList.appendChild(responseItem);
+            });
+        }
+        
+        // Data management functions
+        function saveData() {
+            if (currentKeywords.length === 0) {
+                showStatus('Tambahkan minimal satu keyword!', 'error');
+                return;
+            }
+            
+            if (currentResponses.length === 0) {
+                showStatus('Tambahkan minimal satu response!', 'error');
+                return;
+            }
+            
+            const actionType = document.getElementById('actionType').value;
+            let actionValue = '';
+            let actionCode = null;
+            
+            if (actionType === 'url') {
+                actionValue = document.getElementById('actionValue').value.trim();
+                if (actionValue === '') {
+                    showStatus('URL tidak boleh kosong!', 'error');
+                    return;
+                }
+                
+                actionCode = `function() { window.open("${actionValue}", "_blank"); }`;
+            }
+            
+            const newData = {
+                keywords: [...currentKeywords],
+                responses: [...currentResponses],
+                actionType: actionType,
+                actionValue: actionValue,
+                actionCode: actionCode
+            };
+            
+            if (editingIndex >= 0) {
+                chatbotData[editingIndex] = newData;
+                editingIndex = -1;
+                showStatus('Data berhasil diupdate!', 'success');
+            } else {
+                chatbotData.push(newData);
+                showStatus('Data berhasil disimpan!', 'success');
+            }
+            
+            renderDataTable();
+            resetForm();
+        }
+        
+        function resetForm() {
+            currentKeywords = [];
+            currentResponses = [];
+            renderKeywords();
+            renderResponses();
+            document.getElementById('keywordInput').value = '';
+            document.getElementById('responseInput').value = '';
+            document.getElementById('actionType').value = 'none';
+            document.getElementById('actionValue').value = '';
+            document.getElementById('actionValueContainer').style.display = 'none';
+            editingIndex = -1;
+        }
+        
+        function editItem(index) {
+            editingIndex = index;
+            const item = chatbotData[index];
+            
+            currentKeywords = [...item.keywords];
+            currentResponses = [...item.responses];
+            
+            renderKeywords();
+            renderResponses();
+            
+            document.getElementById('actionType').value = item.actionType || 'none';
+            
+            if (item.actionType === 'url') {
+                document.getElementById('actionValueContainer').style.display = 'block';
+                document.getElementById('actionValue').value = item.actionValue || '';
+            } else {
+                document.getElementById('actionValueContainer').style.display = 'none';
+            }
+            
+            // Scroll to form
+            document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+            
+            showStatus('Data siap untuk diedit. Silakan lakukan perubahan dan klik Simpan Data.', 'success');
+        }
+        
+        function deleteItem(index) {
+            if (confirm('Anda yakin ingin menghapus item ini?')) {
+                chatbotData.splice(index, 1);
+                renderDataTable();
+                showStatus('Data berhasil dihapus!', 'success');
+            }
+        }
+        
+        function clearAllData() {
+            if (confirm('Anda yakin ingin menghapus SEMUA data?')) {
+                chatbotData = [];
+                renderDataTable();
+                showStatus('Semua data berhasil dihapus!', 'success');
+            }
+        }
+        
+        function renderDataTable() {
+            const tableBody = document.getElementById('dataTableBody');
+            tableBody.innerHTML = '';
+            
+            if (chatbotData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Tidak ada data</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            chatbotData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                
+                const keywordsHtml = item.keywords.map(k => `<span>${k}</span>`).join('');
+                const responsesHtml = item.responses.map(r => `<span>${r.length > 30 ? r.substring(0, 30) + '...' : r}</span>`).join('');
+                
+                let actionText = 'Tidak ada';
+                if (item.actionType === 'url') {
+                    actionText = `Buka URL: ${item.actionValue.substring(0, 15)}...`;
+                }
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td class="keyword-cell">${keywordsHtml}</td>
+                    <td class="response-cell">${responsesHtml}</td>
+                    <td>${actionText}</td>
+                    <td class="action-buttons">
+                        <button onclick="editItem(${index})">Edit</button>
+                        <button onclick="deleteItem(${index})" class="danger">Hapus</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Local storage functions
+        function saveToLocalStorage() {
+            if (chatbotData.length === 0) {
+                showStatus('Tidak ada data untuk disimpan!', 'error');
+                return;
+            }
+            
+            try {
+                localStorage.setItem('chatbotData', JSON.stringify(chatbotData));
+                showStatus('Data berhasil disimpan ke browser!', 'success');
+            } catch (error) {
+                showStatus('Gagal menyimpan data: ' + error.message, 'error');
+            }
+        }
+        
+        function loadFromLocalStorage() {
+            try {
+                const data = localStorage.getItem('chatbotData');
+                if (data) {
+                    chatbotData = JSON.parse(data);
+                    renderDataTable();
+                    showStatus('Data berhasil dimuat dari browser!', 'success');
+                } else {
+                    showStatus('Tidak ada data tersimpan di browser!', 'error');
+                }
+            } catch (error) {
+                showStatus('Gagal memuat data: ' + error.message, 'error');
+            }
+        }
+        
+        // Export functions
+        function exportToExcel() {
+            if (chatbotData.length === 0) {
+                showStatus('Tidak ada data untuk diekspor!', 'error');
+                return;
+            }
+            
+            try {
+                // Prepare data for Excel format
+                const excelData = [];
+                
+                // Add header row
+                excelData.push(['No', 'Keywords', 'Responses', 'Action Type', 'Action Value']);
+                
+                // Add data rows
+                chatbotData.forEach((item, index) => {
+                    excelData.push([
+                        index + 1,
+                        item.keywords.join(', '),
+                        item.responses.join(', '),
+                        item.actionType || 'none',
+                        item.actionValue || ''
+                    ]);
+                });
+                
+                // Create workbook
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Chatbot Data');
+                
+                // Generate file and trigger download
+                XLSX.writeFile(wb, 'chatbot_data.xlsx');
+                
+                showStatus('Data berhasil diekspor ke Excel!', 'success');
+            } catch (error) {
+                showStatus('Gagal mengekspor data: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+        
+        // Generate JavaScript file
+        function generateJavaScriptData() {
+            if (chatbotData.length === 0) {
+                showStatus('Tidak ada data untuk diekspor!', 'error');
+                return;
+            }
+            
+            try {
+                // Format data for JavaScript
+                let jsCode = '// datachatbot.js\nconst chatbotData = [\n';
+                
+                chatbotData.forEach((item, index) => {
+                    jsCode += '  {\n';
+                    jsCode += `    keywords: [${item.keywords.map(k => `"${k}"`).join(', ')}],\n`;
+                    jsCode += `    responses: [${item.responses.map(r => `"${r.replace(/"/g, '\\"')}"`).join(', ')}],\n`;
+                    
+                    if (item.actionType === 'url') {
+                        jsCode += `    action: function() {\n      window.open("${item.actionValue.replace(/"/g, '\\"')}", "_blank");\n    }`;
+                    }
+                    
+                    jsCode += '\n  }';
+                    if (index < chatbotData.length - 1) jsCode += ',';
+                    jsCode += '\n';
+                });
+                
+                jsCode += '];\n\n// Export supaya bisa dipakai file lain\n// (Kalau di browser biasa cukup <script src="datachatbot.js">)';
+                
+                // Create blob and download link
+                const blob = new Blob([jsCode], { type: 'application/javascript' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'datachatbot.js';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showStatus('File JavaScript berhasil dibuat!', 'success');
+            } catch (error) {
+                showStatus('Gagal membuat file JavaScript: ' + error.message, 'error');
+            }
+        }
+        
+        // Utility functions
+        function showStatus(message, type) {
+            const statusBar = document.getElementById('statusBar');
+            statusBar.textContent = message;
+            statusBar.className = `status-bar ${type}`;
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                statusBar.className = 'status-bar';
+            }, 5000);
+        }
+        
+        // Initialize
+        window.onload = function() {
+            // Check for saved data
+            if (localStorage.getItem('chatbotData')) {
+                loadFromLocalStorage();
+            } else {
+                renderDataTable();
+            }
+        };
+    </script>
+</body>
+</html>

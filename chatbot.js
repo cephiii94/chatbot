@@ -1,12 +1,11 @@
-
 //fungsi respon JSON
 let dataChatbot = [];
 
 async function loadData() {
-  // Coba cek kalau ada const dataChatbot dari file datachatbot.js
-  if (typeof window.dataChatbot !== "undefined") {
+  // Coba cek kalau ada chatbotData dari file datachatbot.js
+  if (typeof chatbotData !== "undefined") {
     console.log("Menggunakan data dari datachatbot.js");
-    dataChatbot = window.dataChatbot;
+    dataChatbot = chatbotData;
   } else {
     try {
       console.log("Mengambil data dari datachatbot.json");
@@ -18,11 +17,15 @@ async function loadData() {
   }
 }
 
+// Panggil loadData saat halaman dimuat
+document.addEventListener('DOMContentLoaded', loadData);
+
 //fungsi respon javascript
 function prosesInput() {
   const inputUser = document.getElementById("inputUser").value.toLowerCase();
   let jawabanBot = "Maaf, saya belum mengerti pertanyaan Anda.";
 
+  // Pastikan menggunakan data yang benar (dari file datachatbot.js)
   for (let item of chatbotData) {
     for (let kata of item.keywords) {
       if (inputUser.includes(kata)) {

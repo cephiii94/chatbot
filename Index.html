@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot Tuan Cecep</title>
+  <title>Chatbot Nava</title>
   <style>
     * {
       margin: 0;
@@ -119,11 +119,45 @@
       color: #8ab4f8;
       font-size: 0.9rem;
     }
+    
+    /* Tambahan untuk indikator mengetik */
+    .typing-indicator {
+      display: inline-block;
+      margin-right: 5px;
+    }
+    
+    .typing-indicator span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #8ab4f8;
+      margin-right: 3px;
+      animation: typing-animation 1s infinite ease-in-out;
+    }
+    
+    .typing-indicator span:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+    
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.3s;
+      margin-right: 0;
+    }
+    
+    @keyframes typing-animation {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Chatbot <span class="header-accent">Tuan Cecep</span></h1>
+    <h1>Chatbot <span class="header-accent">Nava</span></h1>
     
     <div class="chat-area" id="chatArea">
       <div id="outputBot"></div>
@@ -136,7 +170,7 @@
   </div>
   
   <div class="credit">
-    &copy; 2025 Chatbot Tuan Cecep
+    &copy; 2025 Chatbot Nava
   </div>
 
   <!-- Panggil data kata kunci dulu -->
@@ -146,13 +180,53 @@
   <script src="chatbot.js"></script>
   
   <script>
-    // Tambahan script untuk menampilkan pesan
+    // Kecepatan mengetik (ms per karakter)
+    const kecepatanMengetik = 30;
+    
+    // Fungsi untuk menambahkan pesan dengan efek mengetik
     function tambahPesan(pesan, pengirim) {
       const chatArea = document.getElementById('chatArea');
       const div = document.createElement('div');
-      div.textContent = pesan;
       div.className = `message ${pengirim === 'user' ? 'user-message' : 'bot-message'}`;
-      chatArea.appendChild(div);
+      
+      // Jika pengirim adalah user, tampilkan langsung tanpa efek
+      if (pengirim === 'user') {
+        div.textContent = pesan;
+        chatArea.appendChild(div);
+      } 
+      // Jika pengirim adalah bot, tampilkan indikator mengetik dulu
+      else {
+        // Tambahkan indikator mengetik
+        const typingDiv = document.createElement('div');
+        typingDiv.className = `message bot-message`;
+        typingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+        chatArea.appendChild(typingDiv);
+        
+        // Scroll ke bawah untuk melihat indikator mengetik
+        chatArea.scrollTop = chatArea.scrollHeight;
+        
+        // Mulai animasi mengetik setelah sedikit delay
+        setTimeout(() => {
+          // Hapus indikator mengetik
+          chatArea.removeChild(typingDiv);
+          
+          // Tambahkan div kosong untuk pesan bot
+          chatArea.appendChild(div);
+          
+          // Jalankan animasi mengetik
+          let index = 0;
+          function ketikKarakter() {
+            if (index < pesan.length) {
+              div.textContent += pesan.charAt(index);
+              index++;
+              chatArea.scrollTop = chatArea.scrollHeight;
+              setTimeout(ketikKarakter, kecepatanMengetik);
+            }
+          }
+          ketikKarakter();
+        }, 300); // Delay 1 detik sebelum mulai mengetik
+      }
+      
       chatArea.scrollTop = chatArea.scrollHeight;
     }
     
@@ -164,21 +238,47 @@
       const pesan = inputUser.value.trim();
       
       if (pesan !== '') {
+        // Nonaktifkan input dan tombol selama proses
+        inputUser.disabled = true;
+        document.querySelector('button').disabled = true;
+        
         tambahPesan(pesan, 'user');
         
-        // Jika ada fungsi prosesInput asli, panggil dan dapatkan responsnya
-        if (typeof prosesInputAsli === 'function') {
-          const outputBot = document.getElementById('outputBot');
-          const outputSebelumnya = outputBot.textContent;
-          
-          prosesInputAsli();
-          
-          // Periksa apakah ada respons baru dari bot
-          if (outputBot.textContent !== outputSebelumnya) {
-            tambahPesan(outputBot.textContent, 'bot');
-            outputBot.textContent = ''; // Kosongkan setelah ditampilkan sebagai pesan
+        // Mencari jawaban dari chatbot
+        let jawabanBot = "Maaf, saya belum mengerti pertanyaan Anda.";
+        const inputLower = pesan.toLowerCase();
+        
+        // Cari jawaban dari chatbotData
+        for (let item of chatbotData) {
+          for (let kata of item.keywords) {
+            if (inputLower.includes(kata)) {
+              const semuaJawaban = item.responses;
+              jawabanBot = semuaJawaban[Math.floor(Math.random() * semuaJawaban.length)];
+              
+              // Jalankan action jika ada
+              if (item.action) {
+                setTimeout(() => {
+                  item.action();
+                }, 2000); // Delay sebelum action
+              }
+              
+              break;
+            }
+          }
+          if (jawabanBot !== "Maaf, saya belum mengerti pertanyaan Anda.") {
+            break;
           }
         }
+        
+        // Tampilkan jawaban bot dengan delay untuk efek natural
+        setTimeout(() => {
+          tambahPesan(jawabanBot, 'bot');
+          
+          // Aktifkan kembali input dan tombol
+          inputUser.disabled = false;
+          document.querySelector('button').disabled = false;
+          inputUser.focus();
+        }, 1000);
         
         inputUser.value = '';
       }
@@ -194,7 +294,7 @@
     // Tampilkan pesan sambutan
     window.addEventListener('load', function() {
       setTimeout(function() {
-        tambahPesan('Halo! Saya Tuan Cecep, asisten virtual Anda. Ada yang bisa saya bantu?', 'bot');
+        tambahPesan('Halo! Saya Nava, asisten virtual Anda. Ada yang bisa saya bantu?', 'bot');
       }, 500);
     });
   </script>
