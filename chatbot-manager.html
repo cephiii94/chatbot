@@ -222,24 +222,116 @@
             color: #356abc;
         }
         
-        .status-bar {
-            margin-top: 1rem;
-            padding: 1rem;
+        /* Pop-up Notification Style */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .notification {
+            padding: 15px 20px;
             border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease, fadeOut 0.5s ease 4.5s forwards;
+            max-width: 100%;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        .notification.success {
+            background-color: #4caf50;
+        }
+        
+        .notification.error {
+            background-color: #ff5252;
+        }
+        
+        .notification.info {
+            background-color: #2196f3;
+        }
+        
+        .notification .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 0 0 10px;
+            margin: 0;
+        }
+        
+        /* Confirmation Dialog */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .dialog {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
-            display: none;
         }
         
-        .status-bar.success {
-            background-color: #e8f5e9;
-            color: #4caf50;
-            display: block;
+        .dialog h3 {
+            color: #356abc;
+            margin-bottom: 15px;
         }
         
-        .status-bar.error {
-            background-color: #ffebee;
-            color: #ff5252;
-            display: block;
+        .dialog p {
+            margin-bottom: 20px;
+            color: #555;
+        }
+        
+        .dialog-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .dialog-buttons button {
+            padding: 8px 20px;
+            min-width: 100px;
         }
         
         .footer {
@@ -261,6 +353,11 @@
             th, td {
                 padding: 0.8rem;
             }
+            
+            .notification-container {
+                width: calc(100% - 40px);
+                right: 20px;
+            }
         }
     </style>
     <!-- Menggunakan CDN SheetJS (lebih reliable) -->
@@ -269,8 +366,6 @@
 <body>
     <div class="container">
         <h1>Chatbot <span class="accent">Data Manager</span></h1>
-        
-        <div id="statusBar" class="status-bar"></div>
         
         <div class="form-container">
             <h2>Tambah Data Chatbot</h2>
@@ -316,7 +411,7 @@
                 <button onclick="generateJavaScriptData()" class="success">Generate datachatbot.js</button>
                 <button onclick="saveToLocalStorage()" class="success">Simpan ke Browser</button>
                 <button onclick="loadFromLocalStorage()">Load dari Browser</button>
-                <button onclick="clearAllData()" class="danger">Hapus Semua Data</button>
+                <button onclick="showConfirmDialog('Hapus Semua Data', 'Anda yakin ingin menghapus SEMUA data chatbot? Tindakan ini tidak dapat dibatalkan.', clearAllData)" class="danger">Hapus Semua Data</button>
             </div>
             
             <table id="dataTable">
@@ -338,6 +433,9 @@
         &copy; 2025 Chatbot Data Manager
     </div>
     
+    <!-- Container for notifications -->
+    <div id="notificationContainer" class="notification-container"></div>
+    
     <script>
         // Variables
         let currentKeywords = [];
@@ -355,6 +453,59 @@
             }
         });
         
+        // Notification system
+        function showNotification(message, type) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span>${message}</span>
+                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Confirmation dialog
+        function showConfirmDialog(title, message, confirmCallback, itemData = null) {
+            // Create dialog overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'dialog-overlay';
+            
+            // Create dialog
+            const dialog = document.createElement('div');
+            dialog.className = 'dialog';
+            dialog.innerHTML = `
+                <h3>${title}</h3>
+                <p>${message}</p>
+                <div class="dialog-buttons">
+                    <button class="danger" id="confirmButton">Ya, Hapus</button>
+                    <button id="cancelButton">Batal</button>
+                </div>
+            `;
+            
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+            
+            // Add event listeners
+            document.getElementById('confirmButton').addEventListener('click', function() {
+                overlay.remove();
+                if (typeof confirmCallback === 'function') {
+                    confirmCallback(itemData);
+                }
+            });
+            
+            document.getElementById('cancelButton').addEventListener('click', function() {
+                overlay.remove();
+            });
+        }
+        
         // Functions for keyword handling
         function handleKeywordEnter(event) {
             if (event.key === 'Enter') {
@@ -368,7 +519,7 @@
             const keyword = keywordInput.value.trim().toLowerCase();
             
             if (keyword === '') {
-                showStatus('Keyword tidak boleh kosong!', 'error');
+                showNotification('Keyword tidak boleh kosong!', 'error');
                 return;
             }
             
@@ -376,16 +527,19 @@
                 currentKeywords.push(keyword);
                 renderKeywords();
                 keywordInput.value = '';
+                showNotification(`Keyword "${keyword}" berhasil ditambahkan`, 'success');
             } else {
-                showStatus('Keyword sudah ditambahkan!', 'error');
+                showNotification('Keyword sudah ditambahkan!', 'error');
             }
             
             keywordInput.focus();
         }
         
         function removeKeyword(index) {
+            const keyword = currentKeywords[index];
             currentKeywords.splice(index, 1);
             renderKeywords();
+            showNotification(`Keyword "${keyword}" berhasil dihapus`, 'info');
         }
         
         function renderKeywords() {
@@ -409,7 +563,7 @@
             const response = responseInput.value.trim();
             
             if (response === '') {
-                showStatus('Response tidak boleh kosong!', 'error');
+                showNotification('Response tidak boleh kosong!', 'error');
                 return;
             }
             
@@ -417,8 +571,9 @@
                 currentResponses.push(response);
                 renderResponses();
                 responseInput.value = '';
+                showNotification('Response berhasil ditambahkan', 'success');
             } else {
-                showStatus('Response sudah ditambahkan!', 'error');
+                showNotification('Response sudah ditambahkan!', 'error');
             }
             
             responseInput.focus();
@@ -427,6 +582,7 @@
         function removeResponse(index) {
             currentResponses.splice(index, 1);
             renderResponses();
+            showNotification('Response berhasil dihapus', 'info');
         }
         
         function renderResponses() {
@@ -447,12 +603,12 @@
         // Data management functions
         function saveData() {
             if (currentKeywords.length === 0) {
-                showStatus('Tambahkan minimal satu keyword!', 'error');
+                showNotification('Tambahkan minimal satu keyword!', 'error');
                 return;
             }
             
             if (currentResponses.length === 0) {
-                showStatus('Tambahkan minimal satu response!', 'error');
+                showNotification('Tambahkan minimal satu response!', 'error');
                 return;
             }
             
@@ -463,7 +619,7 @@
             if (actionType === 'url') {
                 actionValue = document.getElementById('actionValue').value.trim();
                 if (actionValue === '') {
-                    showStatus('URL tidak boleh kosong!', 'error');
+                    showNotification('URL tidak boleh kosong!', 'error');
                     return;
                 }
                 
@@ -481,10 +637,10 @@
             if (editingIndex >= 0) {
                 chatbotData[editingIndex] = newData;
                 editingIndex = -1;
-                showStatus('Data berhasil diupdate!', 'success');
+                showNotification('Data berhasil diupdate!', 'success');
             } else {
                 chatbotData.push(newData);
-                showStatus('Data berhasil disimpan!', 'success');
+                showNotification('Data berhasil disimpan!', 'success');
             }
             
             renderDataTable();
@@ -526,23 +682,32 @@
             // Scroll to form
             document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
             
-            showStatus('Data siap untuk diedit. Silakan lakukan perubahan dan klik Simpan Data.', 'success');
+            showNotification('Data siap untuk diedit. Silakan lakukan perubahan dan klik Simpan Data.', 'info');
+        }
+        
+        function confirmDeleteItem(index) {
+            const item = chatbotData[index];
+            const keywordPreview = item.keywords.join(', ');
+            
+            showConfirmDialog(
+                'Hapus Data', 
+                `Anda yakin ingin menghapus data dengan keyword "${keywordPreview}"?`,
+                function() {
+                    deleteItem(index);
+                }
+            );
         }
         
         function deleteItem(index) {
-            if (confirm('Anda yakin ingin menghapus item ini?')) {
-                chatbotData.splice(index, 1);
-                renderDataTable();
-                showStatus('Data berhasil dihapus!', 'success');
-            }
+            chatbotData.splice(index, 1);
+            renderDataTable();
+            showNotification('Data berhasil dihapus!', 'success');
         }
         
         function clearAllData() {
-            if (confirm('Anda yakin ingin menghapus SEMUA data?')) {
-                chatbotData = [];
-                renderDataTable();
-                showStatus('Semua data berhasil dihapus!', 'success');
-            }
+            chatbotData = [];
+            renderDataTable();
+            showNotification('Semua data berhasil dihapus!', 'success');
         }
         
         function renderDataTable() {
@@ -576,7 +741,7 @@
                     <td>${actionText}</td>
                     <td class="action-buttons">
                         <button onclick="editItem(${index})">Edit</button>
-                        <button onclick="deleteItem(${index})" class="danger">Hapus</button>
+                        <button onclick="confirmDeleteItem(${index})" class="danger">Hapus</button>
                     </td>
                 `;
                 
@@ -587,15 +752,15 @@
         // Local storage functions
         function saveToLocalStorage() {
             if (chatbotData.length === 0) {
-                showStatus('Tidak ada data untuk disimpan!', 'error');
+                showNotification('Tidak ada data untuk disimpan!', 'error');
                 return;
             }
             
             try {
                 localStorage.setItem('chatbotData', JSON.stringify(chatbotData));
-                showStatus('Data berhasil disimpan ke browser!', 'success');
+                showNotification('Data berhasil disimpan ke browser!', 'success');
             } catch (error) {
-                showStatus('Gagal menyimpan data: ' + error.message, 'error');
+                showNotification('Gagal menyimpan data: ' + error.message, 'error');
             }
         }
         
@@ -605,19 +770,19 @@
                 if (data) {
                     chatbotData = JSON.parse(data);
                     renderDataTable();
-                    showStatus('Data berhasil dimuat dari browser!', 'success');
+                    showNotification('Data berhasil dimuat dari browser!', 'success');
                 } else {
-                    showStatus('Tidak ada data tersimpan di browser!', 'error');
+                    showNotification('Tidak ada data tersimpan di browser!', 'error');
                 }
             } catch (error) {
-                showStatus('Gagal memuat data: ' + error.message, 'error');
+                showNotification('Gagal memuat data: ' + error.message, 'error');
             }
         }
         
         // Export functions
         function exportToExcel() {
             if (chatbotData.length === 0) {
-                showStatus('Tidak ada data untuk diekspor!', 'error');
+                showNotification('Tidak ada data untuk diekspor!', 'error');
                 return;
             }
             
@@ -647,9 +812,9 @@
                 // Generate file and trigger download
                 XLSX.writeFile(wb, 'chatbot_data.xlsx');
                 
-                showStatus('Data berhasil diekspor ke Excel!', 'success');
+                showNotification('Data berhasil diekspor ke Excel!', 'success');
             } catch (error) {
-                showStatus('Gagal mengekspor data: ' + error.message, 'error');
+                showNotification('Gagal mengekspor data: ' + error.message, 'error');
                 console.error(error);
             }
         }
@@ -657,7 +822,7 @@
         // Generate JavaScript file
         function generateJavaScriptData() {
             if (chatbotData.length === 0) {
-                showStatus('Tidak ada data untuk diekspor!', 'error');
+                showNotification('Tidak ada data untuk diekspor!', 'error');
                 return;
             }
             
@@ -693,22 +858,10 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                showStatus('File JavaScript berhasil dibuat!', 'success');
+                showNotification('File JavaScript berhasil dibuat!', 'success');
             } catch (error) {
-                showStatus('Gagal membuat file JavaScript: ' + error.message, 'error');
+                showNotification('Gagal membuat file JavaScript: ' + error.message, 'error');
             }
-        }
-        
-        // Utility functions
-        function showStatus(message, type) {
-            const statusBar = document.getElementById('statusBar');
-            statusBar.textContent = message;
-            statusBar.className = `status-bar ${type}`;
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                statusBar.className = 'status-bar';
-            }, 5000);
         }
         
         // Initialize
@@ -719,6 +872,11 @@
             } else {
                 renderDataTable();
             }
+            
+            // Tampilkan notifikasi selamat datang
+            setTimeout(() => {
+                showNotification('Selamat datang di Chatbot Data Manager! Mulai tambahkan data chatbot Anda.', 'info');
+            }, 500);
         };
     </script>
 </body>
