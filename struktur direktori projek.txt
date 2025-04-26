@@ -1,0 +1,5 @@
+chatbot-ai-python/
+├── app.py               # File utama aplikasi Flask
+├── requirements.txt     # Daftar dependencies
+└── templates/           # Folder untuk template HTML
+    └── index.html       # File template HTML untuk antarmuka chatbot
