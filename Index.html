@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot Tuan Cecep</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f0f5ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .container {
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(157, 193, 251, 0.3);
+      width: 100%;
+      max-width: 600px;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    
+    h1 {
+      color: #5b8ad4;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      font-size: 2rem;
+    }
+    
+    .header-accent {
+      color: #356abc;
+    }
+    
+    .chat-area {
+      background-color: #eaf2ff;
+      border-radius: 15px;
+      padding: 1.5rem;
+      min-height: 300px;
+      margin-bottom: 1.5rem;
+      overflow-y: auto;
+      max-height: 400px;
+    }
+    
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+    
+    #inputUser {
+      flex-grow: 1;
+      padding: 0.8rem 1.2rem;
+      border: 2px solid #c9dbff;
+      border-radius: 30px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    #inputUser:focus {
+      border-color: #8ab4f8;
+    }
+    
+    button {
+      background-color: #8ab4f8;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #6a9eeb;
+    }
+    
+    .message {
+      margin-bottom: 1rem;
+      padding: 0.8rem 1.2rem;
+      border-radius: 15px;
+      max-width: 80%;
+    }
+    
+    .user-message {
+      background-color: #d7e5ff;
+      color: #356abc;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    
+    .bot-message {
+      background-color: #ffffff;
+      color: #333;
+      align-self: flex-start;
+      box-shadow: 0 2px 5px rgba(157, 193, 251, 0.2);
+    }
+    
+    #outputBot {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .credit {
+      text-align: center;
+      margin-top: 2rem;
+      color: #8ab4f8;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Chatbot <span class="header-accent">Tuan Cecep</span></h1>
+    
+    <div class="chat-area" id="chatArea">
+      <div id="outputBot"></div>
+    </div>
+    
+    <div class="input-area">
+      <input type="text" id="inputUser" placeholder="Tulis pertanyaan..." autofocus>
+      <button onclick="prosesInput()">Kirim</button>
+    </div>
+  </div>
+  
+  <div class="credit">
+    &copy; 2025 Chatbot Tuan Cecep
+  </div>
+
+  <!-- Panggil data kata kunci dulu -->
+  <script src="datachatbot.js"></script>
+
+  <!-- Baru panggil logika chatbot -->
+  <script src="chatbot.js"></script>
+  
+  <script>
+    // Tambahan script untuk menampilkan pesan
+    function tambahPesan(pesan, pengirim) {
+      const chatArea = document.getElementById('chatArea');
+      const div = document.createElement('div');
+      div.textContent = pesan;
+      div.className = `message ${pengirim === 'user' ? 'user-message' : 'bot-message'}`;
+      chatArea.appendChild(div);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+    
+    // Override fungsi prosesInput asli
+    const prosesInputAsli = window.prosesInput || function(){};
+    
+    window.prosesInput = function() {
+      const inputUser = document.getElementById('inputUser');
+      const pesan = inputUser.value.trim();
+      
+      if (pesan !== '') {
+        tambahPesan(pesan, 'user');
+        
+        // Jika ada fungsi prosesInput asli, panggil dan dapatkan responsnya
+        if (typeof prosesInputAsli === 'function') {
+          const outputBot = document.getElementById('outputBot');
+          const outputSebelumnya = outputBot.textContent;
+          
+          prosesInputAsli();
+          
+          // Periksa apakah ada respons baru dari bot
+          if (outputBot.textContent !== outputSebelumnya) {
+            tambahPesan(outputBot.textContent, 'bot');
+            outputBot.textContent = ''; // Kosongkan setelah ditampilkan sebagai pesan
+          }
+        }
+        
+        inputUser.value = '';
+      }
+    }
+    
+    // Event listener untuk tombol Enter
+    document.getElementById('inputUser').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        prosesInput();
+      }
+    });
+    
+    // Tampilkan pesan sambutan
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        tambahPesan('Halo! Saya Tuan Cecep, asisten virtual Anda. Ada yang bisa saya bantu?', 'bot');
+      }, 500);
+    });
+  </script>
+</body>
+</html>
