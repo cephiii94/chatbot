@@ -1,0 +1,137 @@
+# Panduan Penggunaan Chatbot Manager dengan Google Apps Script
+
+Berikut adalah panduan lengkap untuk menyiapkan dan menggunakan Chatbot Manager yang terintegrasi dengan Google Spreadsheet.
+
+## 1. Persiapan Awal
+
+### Membuat Spreadsheet Baru
+1. Buka [Google Sheets](https://sheets.google.com)
+2. Buat spreadsheet baru
+3. Beri nama spreadsheet (misalnya "Chatbot Data Manager")
+
+### Membuat Script
+1. Pada spreadsheet, klik menu **Extensions** > **Apps Script**
+2. Di editor script yang terbuka, hapus kode default yang ada
+3. Buat file-file berikut:
+
+#### File Code.gs
+1. Klik pada "Code.gs" di panel kiri
+2. Hapus semua kode yang ada
+3. Salin dan tempel kode dari file `Code.gs` yang telah disediakan
+4. Klik tombol Save (ikon disket) atau tekan Ctrl+S / Cmd+S
+
+#### File Index.html
+1. Klik ikon + di samping "Files" di panel kiri
+2. Pilih "HTML" 
+3. Beri nama file "Index"
+4. Salin dan tempel kode dari file `Index.html` yang telah disediakan
+5. Klik tombol Save (ikon disket) atau tekan Ctrl+S / Cmd+S
+
+## 2. Deploy Web App
+
+1. Di editor Apps Script, klik tombol **Deploy** di pojok kanan atas
+2. Pilih **New deployment**
+3. Di jendela yang muncul:
+   - Di bagian "Select type", pilih **Web app**
+   - Di bagian "Description", ketik "Chatbot Manager"
+   - Di bagian "Execute as", pilih **Me** (email Anda)
+   - Di bagian "Who has access", pilih salah satu:
+     - **Anyone** - jika ingin semua orang bisa mengakses
+     - **Anyone with Google Account** - jika ingin pengguna harus login Google
+     - **Only myself** - jika hanya Anda yang akan menggunakan
+4. Klik tombol **Deploy**
+5. Akan muncul URL web app. **Simpan URL ini**, karena akan digunakan untuk mengakses aplikasi.
+6. Klik tombol **OK**
+
+### Memberikan Izin Akses
+1. Buka URL web app yang diberikan
+2. Google akan meminta izin untuk mengakses akun Anda
+3. Klik "Allow" atau "Izinkan" untuk memberikan izin yang diperlukan
+4. Aplikasi Chatbot Manager akan terbuka
+
+## 3. Menggunakan Chatbot Manager
+
+### Menambahkan Data Chatbot
+1. Pada bagian "Tambah Data Chatbot":
+   - Ketik keyword di kolom input keyword
+   - Klik "Tambah Keyword" (bisa menambahkan beberapa keyword)
+   - Ketik response di kolom response
+   - Klik "Tambah Response" (bisa menambahkan beberapa response)
+   - Jika diperlukan, pilih Action Type (misalnya URL)
+   - Jika memilih URL, isi URL yang diinginkan
+2. Klik tombol "Simpan Data"
+3. Data akan otomatis tersimpan di Google Spreadsheet Anda
+
+### Mengelola Data
+1. Pada tabel "Data Chatbot":
+   - Lihat daftar semua data chatbot yang telah tersimpan
+   - Gunakan tombol "Edit" untuk mengubah data
+   - Gunakan tombol "Hapus" untuk menghapus data tertentu
+   - Gunakan tombol "Hapus Semua Data" untuk mengosongkan data
+   - Gunakan tombol "Refresh Data" untuk memperbarui tampilan data
+
+### Generate File JavaScript
+1. Klik tombol "Generate datachatbot.js"
+2. File JavaScript akan otomatis diunduh
+3. File ini berisi data chatbot dalam format yang sesuai dengan aplikasi chatbot Anda
+
+## 4. Melihat Data di Spreadsheet
+
+1. Kembali ke Google Spreadsheet Anda
+2. Anda akan melihat sheet "Data Chatbot" berisi semua data yang telah dimasukkan
+3. Data diorganisir dengan kolom:
+   - No 
+   - Keywords
+   - Responses
+   - Action Type
+   - Action Value
+   - Date Created
+
+## 5. Berbagi Akses
+
+Jika Anda ingin berbagi akses ke tim atau kolaborator:
+
+### Berbagi Spreadsheet
+1. Di Google Spreadsheet, klik tombol "Share" di pojok kanan atas
+2. Masukkan email orang yang ingin diberi akses
+3. Pilih level akses (Editor, Commenter, atau Viewer)
+4. Klik "Share"
+
+### Berbagi Web App
+1. Di Apps Script editor, klik **Deploy** > **Manage deployments**
+2. Klik tombol Edit (ikon pensil) pada deployment yang aktif
+3. Ubah "Who has access" sesuai kebutuhan
+4. Klik "Update"
+
+## 6. Tips Tambahan
+
+1. **Otomatisasi**: Anda bisa menjadwalkan script untuk mengirimkan laporan data chatbot secara berkala menggunakan Triggers (Pemicu)
+
+2. **Integrasi**: Fitur ini bisa diintegrasikan dengan layanan Google lain seperti Gmail, Calendar, atau Drive
+
+3. **Backup**: Data tersimpan otomatis di Google Drive dan memiliki riwayat versi yang bisa dipulihkan
+
+4. **Mobile Access**: Anda bisa mengakses aplikasi melalui perangkat mobile dengan membuka URL di browser
+
+5. **Offline Usage**: Untuk file JavaScript yang dihasilkan bisa digunakan secara offline pada aplikasi chatbot Anda
+
+## 7. Pemecahan Masalah
+
+Jika mengalami masalah:
+
+1. **Izin Akses**: Pastikan Anda memberikan semua izin yang diperlukan
+2. **Error Data**: Periksa format data di spreadsheet
+3. **URL Tidak Berfungsi**: Deploy ulang web app jika URL tidak berfungsi
+4. **Versi Script**: Jika membuat perubahan pada script, deploy versi baru
+5. **Quota Limit**: Google Apps Script memiliki batasan harian, hindari penggunaan berlebihan
+
+## 8. Mengupdate Aplikasi
+
+Jika ingin mengupdate aplikasi di kemudian hari:
+
+1. Buka kembali Apps Script editor
+2. Edit kode sesuai kebutuhan
+3. Simpan perubahan
+4. Klik **Deploy** > **Manage deployments**
+5. Klik "New Version"
+6. Klik "Deploy" untuk memperbarui aplikasi

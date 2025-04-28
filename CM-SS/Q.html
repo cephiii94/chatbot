@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <title>Chatbot Data Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f5ff;
+            padding: 2rem;
+        }
+        
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(157, 193, 251, 0.3);
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            margin: 0 auto;
+        }
+        
+        h1, h2 {
+            color: #5b8ad4;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .accent {
+            color: #356abc;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #356abc;
+            font-weight: 500;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #c9dbff;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #8ab4f8;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .keyword-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .keyword-tag {
+            background-color: #eaf2ff;
+            border-radius: 15px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            color: #356abc;
+        }
+        
+        .keyword-tag button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .response-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .response-item {
+            background-color: #eaf2ff;
+            border-radius: 15px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #356abc;
+        }
+        
+        .response-item button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background-color: #8ab4f8;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #6a9eeb;
+        }
+        
+        button.danger {
+            background-color: #ff6b6b;
+        }
+        
+        button.danger:hover {
+            background-color: #ff5252;
+        }
+        
+        button.success {
+            background-color: #4caf50;
+        }
+        
+        button.success:hover {
+            background-color: #3d8b40;
+        }
+        
+        .chatbot-data-container {
+            margin-top: 2rem;
+            border-top: 2px solid #eaf2ff;
+            padding-top: 2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(157, 193, 251, 0.2);
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eaf2ff;
+        }
+        
+        th {
+            background-color: #8ab4f8;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f5f9ff;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-buttons button {
+            padding: 0.5rem 1rem;
+        }
+        
+        .keyword-cell, .response-cell {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .keyword-cell span, .response-cell span {
+            display: inline-block;
+            background-color: #eaf2ff;
+            border-radius: 15px;
+            padding: 5px 10px;
+            margin: 2px;
+            color: #356abc;
+        }
+        
+        /* Pop-up Notification Style */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .notification {
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease, fadeOut 0.5s ease 4.5s forwards;
+            max-width: 100%;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        .notification.success {
+            background-color: #4caf50;
+        }
+        
+        .notification.error {
+            background-color: #ff5252;
+        }
+        
+        .notification.info {
+            background-color: #2196f3;
+        }
+        
+        .notification .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 0 0 10px;
+            margin: 0;
+        }
+        
+        /* Confirmation Dialog */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .dialog {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .dialog h3 {
+            color: #356abc;
+            margin-bottom: 15px;
+        }
+        
+        .dialog p {
+            margin-bottom: 20px;
+            color: #555;
+        }
+        
+        .dialog-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .dialog-buttons button {
+            padding: 8px 20px;
+            min-width: 100px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #8ab4f8;
+            font-size: 0.9rem;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #8ab4f8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        select {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #c9dbff;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+            background-color: white;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="gray" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        
+        select:focus {
+            border-color: #8ab4f8;
+        }
+        
+        .top-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #eaf2ff;
+            color: #356abc;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            th, td {
+                padding: 0.8rem;
+            }
+            
+            .notification-container {
+                width: calc(100% - 40px);
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+    
+    <div class="container">
+        <h1>Chatbot <span class="accent">Data Manager</span></h1>
+        
+        <div class="top-info">
+            <strong>Info:</strong> Data akan disimpan langsung ke Google Spreadsheet Anda. Anda dapat mengelola data chatbot dan mengekspor file Javascript untuk digunakan dalam aplikasi chatbot.
+        </div>
+        
+        <div class="form-container">
+            <h2>Tambah Data Chatbot</h2>
+            
+            <div class="form-group">
+                <label for="keywordInput">Keyword (kata kunci):</label>
+                <input type="text" id="keywordInput" placeholder="Masukkan kata kunci..." onkeypress="handleKeywordEnter(event)">
+                <button onclick="addKeyword()" style="margin-top: 10px;">Tambah Keyword</button>
+                <div id="keywordList" class="keyword-list"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="responseInput">Response (jawaban):</label>
+                <textarea id="responseInput" placeholder="Masukkan jawaban..."></textarea>
+                <button onclick="addResponse()" style="margin-top: 10px;">Tambah Response</button>
+                <div id="responseList" class="response-list"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="actionType">Action Type (opsional):</label>
+                <select id="actionType">
+                    <option value="none">Tidak ada action</option>
+                    <option value="url">Buka URL</option>
+                </select>
+            </div>
+            
+            <div id="actionValueContainer" class="form-group" style="display: none;">
+                <label for="actionValue">URL:</label>
+                <input type="text" id="actionValue" placeholder="https://example.com">
+            </div>
+            
+            <div class="button-container">
+                <button onclick="saveData()">Simpan Data</button>
+                <button onclick="resetForm()" class="danger">Reset Form</button>
+            </div>
+        </div>
+        
+        <div class="chatbot-data-container">
+            <h2>Data Chatbot</h2>
+            
+            <div class="button-container">
+                <button onclick="generateJavaScriptData()" class="success">Generate datachatbot.js</button>
+                <button onclick="refreshData()">Refresh Data</button>
+                <button onclick="showConfirmDialog('Hapus Semua Data', 'Anda yakin ingin menghapus SEMUA data chatbot? Tindakan ini tidak dapat dibatalkan.', clearAllData)" class="danger">Hapus Semua Data</button>
+            </div>
+            
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th width="5%">No</th>
+                        <th width="30%">Keywords</th>
+                        <th width="40%">Responses</th>
+                        <th width="10%">Action</th>
+                        <th width="15%">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="footer">
+        &copy; 2025 Chatbot Data Manager
+    </div>
+    
+    <!-- Container for notifications -->
+    <div id="notificationContainer" class="notification-container"></div>
+    
+    <script>
+        // Variables
+        let currentKeywords = [];
+        let currentResponses = [];
+        let chatbotData = [];
+        let editingIndex = -1;
+        
+        // Event listeners
+        document.getElementById('actionType').addEventListener('change', function() {
+            const actionValueContainer = document.getElementById('actionValueContainer');
+            if (this.value === 'url') {
+                actionValueContainer.style.display = 'block';
+            } else {
+                actionValueContainer.style.display = 'none';
+            }
+        });
+        
+        // Initialize
+        window.onload = function() {
+            loadData();
+            
+            // Tampilkan notifikasi selamat datang
+            setTimeout(() => {
+                showNotification('Selamat datang di Chatbot Data Manager! Mulai tambahkan data chatbot Anda.', 'info');
+            }, 1000);
+        };
+        
+        // Loading Functions
+        function showLoading() {
+            document.getElementById('loadingSpinner').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+        
+        // Data Loading Functions
+        function loadData() {
+            showLoading();
+            google.script.run
+                .withSuccessHandler(function(data) {
+                    if (data.error) {
+                        showNotification('Error: ' + data.error, 'error');
+                    } else {
+                        chatbotData = data;
+                        renderDataTable();
+                    }
+                    hideLoading();
+                })
+                .withFailureHandler(function(error) {
+                    showNotification('Error: ' + error.message, 'error');
+                    hideLoading();
+                })
+                .getData();
+        }
+        
+        function refreshData() {
+            loadData();
+            showNotification('Data berhasil di-refresh!', 'success');
+        }
+        
+        // Notification system
+        function showNotification(message, type) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span>${message}</span>
+                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Confirmation dialog
+        function showConfirmDialog(title, message, confirmCallback, itemData = null) {
+            // Create dialog overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'dialog-overlay';
+            
+            // Create dialog
+            const dialog = document.createElement('div');
+            dialog.className = 'dialog';
+            dialog.innerHTML = `
+                <h3>${title}</h3>
+                <p>${message}</p>
+                <div class="dialog-buttons">
+                    <button class="danger" id="confirmButton">Ya, Hapus</button>
+                    <button id="cancelButton">Batal</button>
+                </div>
+            `;
+            
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+            
+            // Add event listeners
+            document.getElementById('confirmButton').addEventListener('click', function() {
+                overlay.remove();
+                if (typeof confirmCallback === 'function') {
+                    confirmCallback(itemData);
+                }
+            });
+            
+            document.getElementById('cancelButton').addEventListener('click', function() {
+                overlay.remove();
+            });
+        }
+        
+        // Functions for keyword handling
+        function handleKeywordEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addKeyword();
+            }
+        }
+        
+        function addKeyword() {
+            const keywordInput = document.getElementById('keywordInput');
+            const keyword = keywordInput.value.trim().toLowerCase();
+            
+            if (keyword === '') {
+                showNotification('Keyword tidak boleh kosong!', 'error');
+                return;
+            }
+            
+            if (!currentKeywords.includes(keyword)) {
+                currentKeywords.push(keyword);
+                renderKeywords();
+                keywordInput.value = '';
+                showNotification(`Keyword "${keyword}" berhasil ditambahkan`, 'success');
+            } else {
+                showNotification('Keyword sudah ditambahkan!', 'error');
+            }
+            
+            keywordInput.focus();
+        }
+        
+        function removeKeyword(index) {
+            const keyword = currentKeywords[index];
+            currentKeywords.splice(index, 1);
+            renderKeywords();
+            showNotification(`Keyword "${keyword}" berhasil dihapus`, 'info');
+        }
+        
+        function renderKeywords() {
+            const keywordList = document.getElementById('keywordList');
+            keywordList.innerHTML = '';
+            
+            currentKeywords.forEach((keyword, index) => {
+                const keywordTag = document.createElement('div');
+                keywordTag.className = 'keyword-tag';
+                keywordTag.innerHTML = `
+                    ${keyword}
+                    <button onclick="removeKeyword(${index})">×</button>
+                `;
+                keywordList.appendChild(keywordTag);
+            });
+        }
+        
+        // Functions for response handling
+        function addResponse() {
+            const responseInput = document.getElementById('responseInput');
+            const response = responseInput.value.trim();
+            
+            if (response === '') {
+                showNotification('Response tidak boleh kosong!', 'error');
+                return;
+            }
+            
+            if (!currentResponses.includes(response)) {
+                currentResponses.push(response);
+                renderResponses();
+                responseInput.value = '';
+                showNotification('Response berhasil ditambahkan', 'success');
+            } else {
+                showNotification('Response sudah ditambahkan!', 'error');
+            }
+            
+            responseInput.focus();
+        }
+        
+        function removeResponse(index) {
+            currentResponses.splice(index, 1);
+            renderResponses();
+            showNotification('Response berhasil dihapus', 'info');
+        }
+        
+        function renderResponses() {
+            const responseList = document.getElementById('responseList');
+            responseList.innerHTML = '';
+            
+            currentResponses.forEach((response, index) => {
+                const responseItem = document.createElement('div');
+                responseItem.className = 'response-item';
+                responseItem.innerHTML = `
+                    <div>${response}</div>
+                    <button onclick="removeResponse(${index})">×</button>
+                `;
+                responseList.appendChild(responseItem);
+            });
+        }
+        
+        // Data management functions
+        function saveData() {
+            if (currentKeywords.length === 0) {
+                showNotification('Tambahkan minimal satu keyword!', 'error');
+                return;
+            }
+            
+            if (currentResponses.length === 0) {
+                showNotification('Tambahkan minimal satu response!', 'error');
+                return;
+            }
+            
+            const actionType = document.getElementById('actionType').value;
+            let actionValue = '';
+            
+            if (actionType === 'url') {
+                actionValue = document.getElementById('actionValue').value.trim();
+                if (actionValue === '') {
+                    showNotification('URL tidak boleh kosong!', 'error');
+                    return;
+                }
+            }
+            
+            const data = {
+                id: editingIndex,
+                keywords: [...currentKeywords],
+                responses: [...currentResponses],
+                actionType: actionType,
+                actionValue: actionValue
+            };
+            
+            showLoading();
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        resetForm();
+                        loadData(); // Refresh data
+                    } else {
+                        showNotification('Error: ' + result.error, 'error');
+                    }
+                    hideLoading();
+                })
+                .withFailureHandler(function(error) {
+                    showNotification('Error: ' + error.message, 'error');
+                    hideLoading();
+                })
+                .saveData(data);
+        }
+        
+        function resetForm() {
+            currentKeywords = [];
+            currentResponses = [];
+            renderKeywords();
+            renderResponses();
+            document.getElementById('keywordInput').value = '';
+            document.getElementById('responseInput').value = '';
+            document.getElementById('actionType').value = 'none';
+            document.getElementById('actionValue').value = '';
+            document.getElementById('actionValueContainer').style.display = 'none';
+            editingIndex = -1;
+        }
+        
+        function editItem(index) {
+            editingIndex = index;
+            const item = chatbotData[index];
+            
+            currentKeywords = [...item.keywords];
+            currentResponses = [...item.responses];
+            
+            renderKeywords();
+            renderResponses();
+            
+            document.getElementById('actionType').value = item.actionType || 'none';
+            
+            if (item.actionType === 'url') {
+                document.getElementById('actionValueContainer').style.display = 'block';
+                document.getElementById('actionValue').value = item.actionValue || '';
+            } else {
+                document.getElementById('actionValueContainer').style.display = 'none';
+            }
+            
+            // Scroll to form
+            document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+            
+            showNotification('Data siap untuk diedit. Silakan lakukan perubahan dan klik Simpan Data.', 'info');
+        }
+        
+        function confirmDeleteItem(index) {
+            const item = chatbotData[index];
+            const keywordPreview = item.keywords.join(', ');
+            
+            showConfirmDialog(
+                'Hapus Data', 
+                `Anda yakin ingin menghapus data dengan keyword "${keywordPreview}"?`,
+                function() {
+                    deleteItem(index);
+                }
+            );
+        }
+        
+        function deleteItem(index) {
+            showLoading();
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        loadData(); // Refresh data
+                    } else {
+                        showNotification('Error: ' + result.error, 'error');
+                    }
+                    hideLoading();
+                })
+                .withFailureHandler(function(error) {
+                    showNotification('Error: ' + error.message, 'error');
+                    hideLoading();
+                })
+                .deleteData(chatbotData[index].id);
+        }
+        
+        function clearAllData() {
+            showLoading();
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        loadData(); // Refresh data
+                    } else {
+                        showNotification('Error: ' + result.error, 'error');
+                    }
+                    hideLoading();
+                })
+                .withFailureHandler(function(error) {
+                    showNotification('Error: ' + error.message, 'error');
+                    hideLoading();
+                })
+                .clearAllData();
+        }
+        
+        function renderDataTable() {
+            const tableBody = document.getElementById('dataTableBody');
+            tableBody.innerHTML = '';
+            
+            if (chatbotData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Tidak ada data</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            chatbotData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                
+                const keywordsHtml = item.keywords.map(k => `<span>${k}</span>`).join('');
+                const responsesHtml = item.responses.map(r => `<span>${r.length > 30 ? r.substring(0, 30) + '...' : r}</span>`).join('');
+                
+                let actionText = 'Tidak ada';
+                if (item.actionType === 'url') {
+                    actionText = `Buka URL: ${item.actionValue.substring(0, 15)}...`;
+                }
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td class="keyword-cell">${keywordsHtml}</td>
+                    <td class="response-cell">${responsesHtml}</td>
+                    <td>${actionText}</td>
+                    <td class="action-buttons">
+                        <button onclick="editItem(${index})">Edit</button>
+                        <button onclick="confirmDeleteItem(${index})" class="danger">Hapus</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Generate JavaScript file
+        function generateJavaScriptData() {
+            if (chatbotData.length === 0) {
+                showNotification('Tidak ada data untuk diekspor!', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        // Create blob and download link
+                        const blob = new Blob([result.code], { type: 'application/javascript' });
+                        const url = URL.createObjectURL(blob);
+                        
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'datachatbot.js';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        showNotification('File JavaScript berhasil dibuat!', 'success');
+                    } else {
+                        showNotification('Error: ' + result.error, 'error');
+                    }
+                    hideLoading();
+                })
+                .withFailureHandler(function(error) {
+                    showNotification('Error: ' + error.message, 'error');
+                    hideLoading();
+                })
+                .generateJavaScriptData();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "chatbotData": [
+    {
+      "keywords": ["halo", "hai", "hello", "hi"],
+      "responses": [
+        "Halo! Ada yang bisa saya bantu?", 
+        "Hai! Senang bertemu dengan Anda. Ada yang bisa dibantu?",
+        "Hello! Bagaimana kabar Anda hari ini?"
+      ]
+    },
+    {
+      "keywords": ["siapa kamu", "siapa namamu", "nama kamu", "identitas"],
+      "responses": [
+        "Saya Nava, asisten virtual yang siap membantu Anda.",
+        "Nama saya Nava, senang berkenalan dengan Anda!",
+        "Saya Nava, chatbot yang dibuat untuk membantu menjawab pertanyaan Anda."
+      ]
+    },
+    {
+      "keywords": ["terima kasih", "makasih", "thx", "thank"],
+      "responses": [
+        "Sama-sama! Senang bisa membantu.",
+        "Terima kasih kembali. Ada yang bisa saya bantu lagi?",
+        "Dengan senang hati! Jangan ragu untuk bertanya lagi."
+      ]
+    },
+    {
+      "keywords": ["layanan", "bantuan", "service", "jasa"],
+      "responses": [
+        "Kami menyediakan berbagai layanan. Apa yang Anda butuhkan secara spesifik?",
+        "Layanan kami meliputi konsultasi, pengembangan aplikasi, dan dukungan teknis. Apa yang Anda cari?",
+        "Kami siap membantu Anda dengan layanan berkualitas tinggi. Apa yang ingin Anda ketahui lebih lanjut?"
+      ]
+    },
+    {
+      "keywords": ["kontak", "hubungi", "telepon", "email", "alamat"],
+      "responses": [
+        "Anda dapat menghubungi kami di email: contact@nava.com atau telepon: (021) 1234-5678.",
+        "Silakan hubungi tim kami di contact@nava.com atau kunjungi kantor kami di Jalan Merdeka No. 123, Jakarta.",
+        "Untuk informasi lebih lanjut, silakan hubungi kami di (021) 1234-5678 atau kirim email ke contact@nava.com."
+      ]
+    }
+  ]
+}
