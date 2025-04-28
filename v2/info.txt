@@ -1,0 +1,50 @@
+Flow Detail Chatbot Sederhana
+
+[User Mengirim Pertanyaan]
+
+Pengguna mengetik pertanyaan di input form dan mengirimkannya
+Pertanyaan dikirim ke sistem untuk diproses
+
+
+[Preprocessing Pertanyaan]
+
+Mengubah pertanyaan menjadi huruf kecil
+Menghapus tanda baca yang tidak perlu
+Normalisasi spasi dan format
+
+
+[Ekstraksi Kata Kunci]
+
+Memecah pertanyaan menjadi kata-kata individual
+Menghapus "stop words" (kata-kata umum seperti "apa", "yang", "dari", dll)
+Menyimpan kata-kata penting yang tersisa sebagai kata kunci
+
+
+[Pencarian Jawaban di Database]
+
+Database (disimpan di datachatbot.js) berisi informasi dalam bentuk teks
+Teks dibagi menjadi kalimat-kalimat individual untuk dianalisis
+
+
+[Penilaian Kalimat]
+
+Setiap kalimat dalam database diberi skor berdasarkan:
+
+Jumlah kata kunci yang cocok
+Tipe pertanyaan (kapan, apa, bagaimana, dll.)
+Faktor relevansi lainnya
+
+
+
+
+[Pemilihan Jawaban Terbaik]
+
+Kalimat dengan skor tertinggi dipilih
+Jika ada beberapa kalimat dengan skor tinggi, bisa dipilih 1-2 kalimat terbaik
+
+
+[Menampilkan Jawaban]
+
+Jawaban ditampilkan kepada pengguna dalam antarmuka chat
+
+Setiap entri dalam database berisi ID untuk identifikasi dan konten berupa teks paragraf yang berisi informasi. Saat melakukan pencarian, sistem akan memecah teks ini menjadi kalimat-kalimat individu untuk dianalisis dan diberi skor.
