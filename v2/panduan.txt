@@ -1,0 +1,17 @@
+Untuk menambah database pengetahuan di chatbot Anda, Anda perlu fokus pada file knowledge.js. Ini adalah file yang berisi informasi faktual yang digunakan chatbot untuk menjawab pertanyaan dengan pendekatan kontekstual.
+Cara Menambahkan Database Pengetahuan
+
+1. Buka file knowledge.js
+2. Tambahkan entri baru ke array knowledgeBase. 
+3. Pastikan setiap entri berisi informasi yang kaya dan faktual. Semakin banyak fakta dan detail dalam entri, semakin baik chatbot bisa menemukan jawaban yang tepat.
+
+Tips untuk Konten yang Efektif
+
+1. Tulis dalam format paragraf: Satu paragraf berisi dengan banyak fakta, tarikh, dan informasi.
+2. Sertakan tahun dan tanggal: Sangat membantu saat pengguna bertanya "kapan" sesuatu terjadi.
+3. Sertakan definisi: Gunakan pola "X adalah Y" untuk memudahkan chatbot menjawab pertanyaan definisi.
+4. Pastikan informasi faktual: Informasi seharusnya faktual dan akurat.
+5. Pisahkan topik yang berbeda: Setiap entri sebaiknya berfokus pada satu topik yang spesifik.
+6. Gunakan kalimat lengkap: Untuk memudahkan pemecahan teks dan pencarian.
+
+Dengan menambahkan informasi berkualitas tinggi ke dalam knowledge.js, chatbot Anda akan semakin pintar dalam menjawab berbagai pertanyaan factual tanpa perlu menambahkan keyword spesifik ke dalam datachatbot.js.
